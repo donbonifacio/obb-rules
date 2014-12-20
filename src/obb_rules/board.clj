@@ -1,6 +1,16 @@
 (ns obb-rules.board
   (:use obb-rules.element)
-  (:require [clojure.math.numeric-tower :as math]))
+  (:require [clojure.math.numeric-tower :as math]
+            [obb-rules.simplifier :as simplify]))
+
+(def default-board-w 8)
+(def default-board-h 8)
+
+(defn- random-terrain
+  "Provides a random terrain"
+  []
+  (rand-nth [:water :ice :terrest
+             :desert :rock :forest]))
 
 (defn create-board
   "Creates an empty board"
@@ -8,29 +18,45 @@
   ([w h]
   {:width w
    :height h
+   :terrain (random-terrain)
    :elements {}}))
 
 (defn- player-element?
   "True if the given element is from the given player"
   [player [coordinate element]]
-  (= player (element-player element)))
+  (simplify/name= player (element-player element)))
+
+(defn board-elements
+  "Gets the elements of a given player"
+  [board player]
+  (->> (board :elements)
+       (filter (partial player-element? player))
+       (map #(last %))))
 
 (defn board-elements-count
   "Gets the number of board elements"
   ([board]
    (count (board :elements)))
   ([board player]
-   (count (filter (partial player-element? player) (board :elements)))))
+   (count (board-elements board player))))
 
 (defn empty-board?
   "Checks if a board is empty"
   ([board]
    (= 0 (board-elements-count board)))
   ([board player]
-   (= 0 (board-elements-count board player))))
+   (= 0 (board-elements-count board (keyword player)))))
 
-(defn board-width "Gets a board's witdh" [board] (board :width))
-(defn board-height "Gets a board's height" [board] (board :height))
+(defn board-width "Gets a board's witdh" [board] (or (board :width) default-board-w))
+(defn board-height "Gets a board's height" [board] (or (board :height) default-board-h))
+(defn board-terrain "Gets the board's terrain" [board] (board :terrain))
+
+(defn elements
+  "Gets/sets all the elements"
+  ([board]
+   (board :elements))
+  ([board elements]
+   (assoc board :elements elements)))
 
 (defn get-element
   "Gets an element given a coordinate"

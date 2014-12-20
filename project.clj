@@ -1,6 +1,6 @@
-(defproject obb-rules "0.1.0"
+(defproject obb-rules "1.3.6"
   :description "Orion's Belt battle rules"
-  :url "http://example.com/FIXME"
+  :url "https://github.com/orionsbelt-battlegrounds/obb-rules"
 
   :license {:name         "The MIT License"
             :url          "file://LICENSE"
@@ -11,10 +11,11 @@
   :source-paths ["src"]
   :test-paths ["test"]
 
+  :scm {:name "git"
+        :url "git@github.com:orionsbelt-battlegrounds/obb-rules.git"}
+
   :profiles {:dev 
-             {:dependencies [[midje "1.6.3"]]
-              :plugins [[com.jakemccrary/lein-test-refresh "0.5.2"]
-                        [lein-cloverage "1.0.2"]
-                        [lein-midje "3.0.0"]]}}
+             {:plugins [[com.jakemccrary/lein-test-refresh "0.5.4"]
+                        [lein-cloverage "1.0.2"]]}}
 
   )

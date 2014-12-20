@@ -1,6 +1,5 @@
 (ns obb-rules.actions.move-test
   (:use clojure.test
-        midje.sweet
         obb-rules.action
         obb-rules.actions.move
         obb-rules.board
@@ -19,10 +18,13 @@
 (def pretorian-element (create-element :p1 pretorian 10 :south))
 (def board (place-element (create-board) [2 2] rain-element))
 
-(defn- test-complete-move
-  [board old-coord new-coord expected-success?]
-  (let [move (build-action [:move old-coord new-coord 10])
-        result (move board :p1)]
+(defn- test-complete-move-action
+  "Tests a movement outcome"
+  [board old-coord new-coord expected-success? move-action]
+  (let [move (build-action [move-action old-coord new-coord])
+        result (move board :p1)
+        efrom (get-element board old-coord)
+        possible-moves (find-possible-destinations board efrom)]
     (if expected-success?
       (do
         (is (succeeded? result))
@@ -30,56 +32,109 @@
           (let [new-board (result-board result)
                 new-element (get-element new-board new-coord)
                 old-element (get-element new-board old-coord)]
+            (is (some #(= new-coord %) possible-moves))
             (is (not old-element))
             (is new-element)
             (assert-element new-element))))
       (do
+        (is (not (some #(= new-coord %) possible-moves)))
         (is (failed? result))))))
 
-(deftest movement-restrictions
+(defn- test-complete-move
+  "Tests a movement using the :move and :goto actions"
+  [board old-coord new-coord expected-success?]
+  (test-complete-move-action board old-coord new-coord expected-success? :move)
+  (test-complete-move-action board old-coord new-coord expected-success? :goto))
 
-  (testing "front movement"
-    (let [board (place-element (create-board) [2 2] crusader-element)]
-      (test-complete-move board [2 2] [1 1] false)
-      (test-complete-move board [2 2] [1 2] false)
-      (test-complete-move board [2 2] [1 3] false)
-      (test-complete-move board [2 2] [2 1] false)
-      (test-complete-move board [2 2] [2 3] true)
-      (test-complete-move board [2 2] [3 1] false)
-      (test-complete-move board [2 2] [3 2] false)
-      (test-complete-move board [2 2] [3 3] false)))
+(deftest front-movement-east
+  (let [element (element-direction crusader-element :east)
+        board (place-element (create-board) [2 2] element)]
+    (test-complete-move board [2 2] [1 1] false)
+    (test-complete-move board [2 2] [1 2] false)
+    (test-complete-move board [2 2] [1 3] false)
+    (test-complete-move board [2 2] [2 1] false)
+    (test-complete-move board [2 2] [2 3] false)
+    (test-complete-move board [2 2] [3 1] false)
+    (test-complete-move board [2 2] [3 2] true)
+    (test-complete-move board [2 2] [3 3] false)))
 
-  (testing "normal movement"
-    (let [board (place-element (create-board) [2 2] nova-element)]
-      (test-complete-move board [2 2] [1 1] false)
-      (test-complete-move board [2 2] [1 2] true)
-      (test-complete-move board [2 2] [1 3] false)
-      (test-complete-move board [2 2] [2 1] true)
-      (test-complete-move board [2 2] [2 3] true)
-      (test-complete-move board [2 2] [3 1] false)
-      (test-complete-move board [2 2] [3 2] true)
-      (test-complete-move board [2 2] [3 3] false)))
-
-  (testing "diagonal movement"
-    (let [board (place-element (create-board) [2 2] pretorian-element)]
-      (test-complete-move board [2 2] [1 1] true)
-      (test-complete-move board [2 2] [1 2] false)
-      (test-complete-move board [2 2] [1 3] true)
-      (test-complete-move board [2 2] [2 1] false)
-      (test-complete-move board [2 2] [2 3] false)
-      (test-complete-move board [2 2] [3 1] true)
-      (test-complete-move board [2 2] [3 2] false)
-      (test-complete-move board [2 2] [3 3] true)))
-
-  (testing "all-movement"
-    (test-complete-move board [2 2] [1 1] true)
+(deftest front-movement-north
+  (let [element (element-direction crusader-element :west)
+        board (place-element (create-board) [2 2] element)]
+    (test-complete-move board [2 2] [1 1] false)
     (test-complete-move board [2 2] [1 2] true)
-    (test-complete-move board [2 2] [1 3] true)
+    (test-complete-move board [2 2] [1 3] false)
+    (test-complete-move board [2 2] [2 1] false)
+    (test-complete-move board [2 2] [2 3] false)
+    (test-complete-move board [2 2] [3 1] false)
+    (test-complete-move board [2 2] [3 2] false)
+    (test-complete-move board [2 2] [3 3] false)))
+
+(deftest front-movement-south
+  (let [board (place-element (create-board) [2 2] crusader-element)]
+    (test-complete-move board [2 2] [1 1] false)
+    (test-complete-move board [2 2] [1 2] false)
+    (test-complete-move board [2 2] [1 3] false)
+    (test-complete-move board [2 2] [2 1] false)
+    (test-complete-move board [2 2] [2 3] true)
+    (test-complete-move board [2 2] [3 1] false)
+    (test-complete-move board [2 2] [3 2] false)
+    (test-complete-move board [2 2] [3 3] false)))
+
+(deftest front-movement-north
+  (let [element (element-direction crusader-element :north)
+        board (place-element (create-board) [2 2] element)]
+    (test-complete-move board [2 2] [1 1] false)
+    (test-complete-move board [2 2] [1 2] false)
+    (test-complete-move board [2 2] [1 3] false)
+    (test-complete-move board [2 2] [2 1] true)
+    (test-complete-move board [2 2] [2 3] false)
+    (test-complete-move board [2 2] [3 1] false)
+    (test-complete-move board [2 2] [3 2] false)
+    (test-complete-move board [2 2] [3 3] false)))
+
+(deftest normal-movement
+  (let [board (place-element (create-board) [2 2] nova-element)]
+    (test-complete-move board [2 2] [1 1] false)
+    (test-complete-move board [2 2] [1 2] true)
+    (test-complete-move board [2 2] [1 3] false)
     (test-complete-move board [2 2] [2 1] true)
     (test-complete-move board [2 2] [2 3] true)
-    (test-complete-move board [2 2] [3 1] true)
+    (test-complete-move board [2 2] [3 1] false)
     (test-complete-move board [2 2] [3 2] true)
+    (test-complete-move board [2 2] [3 3] false)))
+
+(deftest diagonal-movement
+  (let [board (place-element (create-board) [2 2] pretorian-element)]
+    (test-complete-move board [2 2] [1 1] true)
+    (test-complete-move board [2 2] [1 2] false)
+    (test-complete-move board [2 2] [1 3] true)
+    (test-complete-move board [2 2] [2 1] false)
+    (test-complete-move board [2 2] [2 3] false)
+    (test-complete-move board [2 2] [3 1] true)
+    (test-complete-move board [2 2] [3 2] false)
     (test-complete-move board [2 2] [3 3] true)))
+
+(deftest all-movement
+  (test-complete-move board [2 2] [1 1] true)
+  (test-complete-move board [2 2] [1 2] true)
+  (test-complete-move board [2 2] [1 3] true)
+  (test-complete-move board [2 2] [2 1] true)
+  (test-complete-move board [2 2] [2 3] true)
+  (test-complete-move board [2 2] [3 1] true)
+  (test-complete-move board [2 2] [3 2] true)
+  (test-complete-move board [2 2] [3 3] true))
+
+(deftest allow-default-quantity
+  (let [old-coord [2 2]
+        new-coord [1 2]
+        move (build-action [:move old-coord new-coord])
+        result (move board :p1)
+        new-board (result-board result)
+        new-element (get-element new-board new-coord)]
+    (is (succeeded? result))
+    (is new-element)
+    (is (= 10 (element-quantity new-element)))))
 
 (deftest partial-movement
 
@@ -102,6 +157,14 @@
   (testing "full move cost"
     (is (= 2 (movement-cost rain true)))
     (is (= 1 (movement-cost rain false)))))
+
+(deftest should-support-key-string-on-player
+  (let [action (build-action [:move [1 1] [2 2] 10])
+        element (create-element "p1" rain 10 :south)
+        board (place-element (create-board) [1 1] element)
+        result (action board :p1)]
+    (is (succeeded? result))
+    (is (= "OK" (result-message result)))))
 
 (deftest generic-movement
 
@@ -159,11 +222,25 @@
         (is (failed? result))
         (is (= "UnitMismatch" (result-message result)))))
 
+    (testing "target element is frozen"
+      (let [action (build-action [:move [2 2] [3 3] 10])
+            element (-> (create-element :p1 rain 10 :south)
+                        (freeze))
+            new-board (place-element board [3 3] element)
+            result (action new-board :p1)]
+        (is (failed? result))
+        (is (= "FrozenElement" (result-message result)))))
+
+    (testing "from element is frozen"
+      (let [action (build-action [:move [2 2] [3 3] 10])
+            new-board (place-element (create-board) [2 2] (-> rain-element freeze))
+            result (action new-board :p1)]
+        (is (failed? result))
+        (is (= "FrozenElement" (result-message result)))))
+
     (testing "coordinate empty"
       (let [action (build-action [:move [1 1] [1 2] :10])
             board (create-board)
             result (move-down board :p1)]
         (is (failed? result))
         (is (= "EmptyCoordinate" (result-message result)))))))
-
-(run-tests)

@@ -1,7 +1,6 @@
 (ns obb-rules.actions.attack-test
   (:require [obb-rules.element :as element])
   (:use clojure.test
-        midje.sweet
         obb-rules.action
         obb-rules.actions.move
         obb-rules.board
@@ -68,6 +67,12 @@
       (is (failed? result))
       (is (= "SamePlayer" (result-message result)))))
 
+  (testing "player name resolution"
+    (let [attack (build-action [:attack [2 2] [2 3]])
+          result (attack board "p1")]
+      (is (succeeded? result))
+      (is (= "OK" (result-message result)))))
+
   (testing "player not owned"
     (let [attack (build-action [:attack [2 2] [2 3]])
           result (attack board :p2)]
@@ -91,5 +96,3 @@
           result (attack board :p1)]
       (is (succeeded? result))
       (is (nil? (get-element (result-board result) [2 3]))))))
-
-(run-tests)

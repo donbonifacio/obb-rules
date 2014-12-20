@@ -10,6 +10,7 @@
       (is board)
       (is (empty-board? board))
       (is (= 0 (board-elements-count board)))
+      (is (board-terrain board))
       (is (= false (has-element? board [1 1])))
       (is (= 9 (board-height board)))
       (is (= 8 (board-width board)))))
@@ -53,4 +54,6 @@
   (testing "not adjacent"
     (is (not (adjacent? [2 2] [4 4])))))
 
-(run-tests)
+(deftest default-board-size
+  (is (= default-board-w (board-width {})))
+  (is (= default-board-h (board-height {}))))

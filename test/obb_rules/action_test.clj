@@ -20,14 +20,25 @@
 
   (testing "load deploy"
     (loader-check [:deploy 100 :rain [8 8]]))
+  (testing "load deploy as string"
+    (loader-check ["deploy" 100 "rain" [8 8]]))
 
   (testing "load attack"
     (loader-check [:attack [1 1] [2 2]]))
+  (testing "load attack as string"
+    (loader-check ["attack" [1 1] [2 2]]))
 
   (testing "load move"
     (loader-check [:move [1 1] [2 2] 10]))
+  (testing "load move as string"
+    (loader-check ["move" [1 1] [2 2] 10]))
+
+  (testing "load goto"
+    (loader-check [:goto [1 1] [2 2]]))
+  (testing "load goto as string"
+    (loader-check ["goto" [1 1] [2 2]]))
 
   (testing "load rotate"
-    (loader-check [:rotate [1 1] :south])))
-
-(run-tests)
+    (loader-check [:rotate [1 1] :south]))
+  (testing "load rotate as string"
+    (loader-check ["rotate" [1 1] "south"])))

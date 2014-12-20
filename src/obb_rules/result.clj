@@ -16,11 +16,15 @@
 
 (defn action-success
   "Represents a successful action"
-  [resulting-board cost]
-  (action-result true resulting-board cost "OK"))
+  ([resulting-board cost]
+   (action-success resulting-board cost "OK"))
+  ([resulting-board cost message]
+   (action-result true resulting-board cost message)))
 
 (defn action-failed
   "Represents an unsuccessful action"
-  [message]
-  (action-result false nil 0 message))
+  ([message]
+   (action-result false nil 0 message))
+  ([message game]
+   (action-result false game 0 message)))
 
