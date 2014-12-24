@@ -17,7 +17,7 @@
     (is (not (stash/cleared? game)))))
 
 (deftest complete-game-processing
-  (let [stash (stash/create :kamikaze 1)
+  (let [stash (stash/create "kamikaze" 1)
         game (game/create stash)
         result2 (turn/process game :p1 [:deploy 1 :kamikaze [1 7]])
         game2 (result/result-board result2)
@@ -31,7 +31,8 @@
     (is (stash/cleared? (game/get-stash game4 :p1)))
     (is (= false (game-mode/final? game4)))
 
-    (let [result (turn/process game4 :p1 [:move [1 7] [1 6] 1]
+    (let [game4 (game/state game4 :p1)
+          result (turn/process game4 :p1 [:move [1 7] [1 6] 1]
                                          [:move [1 6] [1 5] 1]
                                          [:move [1 5] [1 4] 1]
                                          [:move [1 4] [1 3] 1]

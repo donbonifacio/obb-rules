@@ -1,6 +1,11 @@
 (ns obb-rules.stash
   (:require [obb-rules.unit :as unit]))
 
+(defn create-from-hash
+  "Creates a new stash from the given hash"
+  [unit-hash]
+  unit-hash)
+
 (defn create
   "Creates a new stash"
   [& units]
@@ -9,7 +14,7 @@
 (defn how-many?
   "States how many of a unit are present"
   [stash unit]
-  (or (stash unit) 0))
+  (or (stash (name unit)) 0))
 
 (defn cleared?
   "Returns true if this stash is empty"
