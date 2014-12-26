@@ -4,6 +4,8 @@
             [obb-rules.units.pretorian]
             [obb-rules.units.raptor]
             [obb-rules.units.worm]
+            [obb-rules.units.eagle]
+            [obb-rules.units.vector]
             [obb-rules.units.heavy-seeker]
             [obb-rules.units.scarab]
             [obb-rules.units.toxic]
@@ -20,7 +22,9 @@
    obb-rules.units.raptor/metadata
    obb-rules.units.toxic/metadata
    obb-rules.units.worm/metadata
+   obb-rules.units.vector/metadata
    obb-rules.units.anubis/metadata
+   obb-rules.units.eagle/metadata
    obb-rules.units.heavy-seeker/metadata
    obb-rules.units.scarab/metadata
    obb-rules.units.kamikaze/metadata
@@ -57,6 +61,8 @@
 (defn unit-movement-cost "Gets a unit's movement cost" [unit] (unit :movement-cost))
 (defn unit-movement-type "Gets a unit's movement type" [unit] (unit :movement-type))
 (defn unit-category "Gets a unit's category" [unit] (unit :category))
+(defn attack-type "Gets the unit's attack type" [unit] (or (unit :attack-type) :direct))
+(defn catapult? "True if the unit has catapult" [unit] (= :catapult (attack-type unit)))
 
 (defn units-by-category
   "Gets all the units for a given category"
