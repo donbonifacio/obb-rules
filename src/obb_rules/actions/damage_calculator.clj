@@ -28,13 +28,19 @@
   (let [unit (element-unit defender-element)]
     (unit-defense unit)))
 
-(defn destroyed
+(defn destroyed-with-unused-damage
   "Gets how many units an attack will destroy"
   [attacker-element defender-element]
   (let [total-damage (damage attacker-element defender-element)
-        total-defense (defense attacker-element defender-element)
-        destroyed (/ total-damage total-defense)
+        elem-defense (defense attacker-element defender-element)
+        destroyed (/ total-damage elem-defense)
         defender-quantity (element-quantity defender-element)]
     (if (> destroyed defender-quantity)
-      defender-quantity
-      destroyed)))
+      [defender-quantity 0]
+      [destroyed (- total-damage (* elem-defense defender-quantity))])))
+
+(defn destroyed
+  "Gets how many units an attack will destroy"
+  [attacker-element defender-element]
+  (let [[destroyed _] (destroyed-with-unused-damage attacker-element defender-element)]
+    destroyed))
