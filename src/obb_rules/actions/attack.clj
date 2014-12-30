@@ -60,16 +60,21 @@
                                 :unused-damage unused-damage
                                 :info info}))
 
+(defn- process-hooks
+  "Processes registered handlers on hooks"
+  [board attacker target unused-damage info]
+  (process-after-attack board attacker target unused-damage info))
+
 (defn- process-attack
   "Processes the attack"
   [board attacker target attack-type]
-  (let [[destroyed unused-damage] (calculator/destroyed-with-unused-damage attacker target)
+  (let [[destroyed unused-damage] (calculator/destroyed-with-unused-damage board attacker target)
         attacker-coordinate (element-coordinate attacker)
         coordinate (element-coordinate target)
         frozen-board (swap-element board attacker-coordinate (element/freeze attacker))
         attack-board (remove-from-element frozen-board coordinate destroyed)
         attack-info (build-basic-attack-info attack-type destroyed target)
-        [final-board final-info] (process-after-attack attack-board attacker target unused-damage attack-info)]
+        [final-board final-info] (process-hooks attack-board attacker target unused-damage attack-info)]
     (action-success final-board 1 "OK" final-info)))
 
 (defn build-attack
