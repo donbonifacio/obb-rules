@@ -49,7 +49,8 @@
   (let [target-unit (element-unit target)]
     [{:attack-type attack-type
       :destroyed destroyed
-      :unit (unit-name target-unit)}]))
+      :unit (unit-name target-unit)
+      :target (element/element-player target)}]))
 
 (defn- process-after-attack
   "Processes registered handlers for after-attack"
@@ -60,10 +61,20 @@
                                 :unused-damage unused-damage
                                 :info info}))
 
+(defn- process-after-hit
+  "Processes registered handlers for after-hit"
+  [board attacker target unused-damage info]
+  (hooks/process :after-hit {:board board
+                             :attacker attacker
+                             :target target
+                             :unused-damage unused-damage
+                             :info info}))
+
 (defn- process-hooks
   "Processes registered handlers on hooks"
   [board attacker target unused-damage info]
-  (process-after-attack board attacker target unused-damage info))
+  (let [[board info] (process-after-attack board attacker target unused-damage info)]
+    (process-after-hit board attacker target unused-damage info)))
 
 (defn- process-attack
   "Processes the attack"
