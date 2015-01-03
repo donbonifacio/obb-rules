@@ -15,18 +15,15 @@
 (defn damage
   "Gets the base damage given by a unit to another"
   [board attacker-element defender-element]
-  (let [attacker-unit (element-unit attacker-element)
-        defender-unit (element-unit defender-element)
-        attacker-quantity (element-quantity attacker-element)
-        attack (unit-attack attacker-unit)
+  (let [attacker-quantity (element-quantity attacker-element)
+        attack (element-attack board attacker-element defender-element)
         distance-perc (distance-factor attacker-element defender-element)]
     (int (* attack attacker-quantity distance-perc))))
 
 (defn defense
   "Gets the defense of a given unit from another"
   [board attacker-element defender-element]
-  (let [unit (element-unit defender-element)]
-    (unit-defense unit)))
+  (element-defense board attacker-element defender-element))
 
 (defn destroyed-with-unused-damage
   "Gets how many units an attack will destroy"
