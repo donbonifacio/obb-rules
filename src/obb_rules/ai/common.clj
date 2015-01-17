@@ -8,6 +8,7 @@
             [obb-rules.evaluator :as evaluator]
             [obb-rules.result :as result]
             [obb-rules.actions.direction :as dir]
+            [obb-rules.actions.move :as move]
             [obb-rules.simplifier :as simplify]
             [obb-rules.element :as element]
             [obb-rules.board :as board]
@@ -88,6 +89,17 @@
                      (flatten)
                      (filter #(seq %1)))]
     options))
+
+(defn move-attack-options
+  "Returns a collection of possible options that first move and then
+  attack"
+  [game element]
+  (let [coordinate (element/element-coordinate element)
+        player (element/element-player element)
+        possible-coords (move/find-all-possible-destinations game element)
+        ]
+    #_(println possible-coords)
+    []))
 
 (defn option-value-sorter
   "Sorts a collection of options based on the value"
